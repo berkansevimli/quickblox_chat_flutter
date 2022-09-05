@@ -32,39 +32,46 @@ class _SignInScreenState extends State<SignInScreen> {
       body: Center(
           child: Form(
         key: _formKey,
-        child: Column(
-          children: [
-            TextFormField(
-              onSaved: (newValue) => username = newValue,
-              decoration: InputDecoration(hintText: "Username"),
-              validator: (value) {
-                if (value!.isEmpty) return "Enter Username";
-                return null;
-              },
-            ),
-            SizedBox(
-              height: 16,
-            ),
-            TextFormField(
-              obscureText: true,
-              onSaved: (newValue) => password = newValue,
-              decoration: InputDecoration(hintText: "Password"),
-              validator: (value) {
-                if (value!.isEmpty) return "Enter Password";
-                return null;
-              },
-            ),
-            MaterialButton(
-                child: Text("Login"),
-                onPressed: (() async {
-                  _formKey.currentState!.save();
-                  if (_formKey.currentState!.validate()) {
-                    bool isSucces = await QuickbloxServices.login(
-                        _scaffoldKey, username!, password!);
-                    if (isSucces) {}
-                  }
-                }))
-          ],
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextFormField(
+                onSaved: (newValue) => username = newValue,
+                decoration: InputDecoration(hintText: "Username"),
+                validator: (value) {
+                  if (value!.isEmpty) return "Enter Username";
+                  return null;
+                },
+              ),
+              SizedBox(
+                height: 16,
+              ),
+              TextFormField(
+                obscureText: true,
+                onSaved: (newValue) => password = newValue,
+                decoration: InputDecoration(hintText: "Password"),
+                validator: (value) {
+                  if (value!.isEmpty) return "Enter Password";
+                  return null;
+                },
+              ),
+              SizedBox(
+                height: 16,
+              ),
+              MaterialButton(
+                  child: Text("Login"),
+                  onPressed: (() async {
+                    _formKey.currentState!.save();
+                    if (_formKey.currentState!.validate()) {
+                      bool isSucces = await QuickbloxServices.login(
+                          _scaffoldKey, context, username!, password!);
+                      if (isSucces) {}
+                    }
+                  }))
+            ],
+          ),
         ),
       )),
     );
