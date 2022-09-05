@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:quickblox_chat_flutter/quickblox/services.dart';
 import 'package:quickblox_chat_flutter/quickblox/setup.dart';
+import 'package:quickblox_chat_flutter/screens/auth/signup.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({Key? key}) : super(key: key);
@@ -60,7 +61,20 @@ class _SignInScreenState extends State<SignInScreen> {
               SizedBox(
                 height: 16,
               ),
-              MaterialButton(
+              Row(
+                children: [
+                  Spacer(),
+                  TextButton(
+                      child: Text("Signup"),
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (builder) => RegisterScreen()));
+                      })
+                ],
+              ),
+              TextButton(
                   child: Text("Login"),
                   onPressed: (() async {
                     _formKey.currentState!.save();
@@ -69,7 +83,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           _scaffoldKey, context, username!, password!);
                       if (isSucces) {}
                     }
-                  }))
+                  })),
             ],
           ),
         ),

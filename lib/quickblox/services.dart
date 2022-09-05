@@ -43,6 +43,26 @@ class QuickbloxServices {
     }
   }
 
+  ///Signup
+  static Future<void> createUser(
+      GlobalKey<ScaffoldState> scaffoldKey,
+      BuildContext context,
+      String username,
+      String password,
+      String fullname) async {
+    try {
+      QBUser? user =
+          await QB.users.createUser(username, password, fullName: fullname);
+      int? userId = user!.id;
+      SnackBarUtils.showResult(scaffoldKey,
+          "User was created: \n login: $login \n password: $password \n id: $userId");
+      Navigator.pushAndRemoveUntil(context,
+          MaterialPageRoute(builder: (_) => UsersScreen()), (route) => false);
+    } on PlatformException catch (e) {
+      DialogUtils.showError(context, e);
+    }
+  }
+
   ///Logout
   static Future<void> logout(
     BuildContext context,
