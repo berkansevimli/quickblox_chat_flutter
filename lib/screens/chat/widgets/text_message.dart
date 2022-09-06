@@ -42,7 +42,7 @@ class TextMessage extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: EdgeInsets.all(4.0),
+              padding: EdgeInsets.symmetric(vertical: 2.0, horizontal: 8),
               child: Text(
                 Utils.toTime(
                     DateTime.fromMillisecondsSinceEpoch(message!.messageTime)),

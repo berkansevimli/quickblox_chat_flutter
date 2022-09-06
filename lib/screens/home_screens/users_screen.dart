@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:quickblox_chat_flutter/quickblox/services.dart';
 import 'package:quickblox_chat_flutter/screens/chat/Screens/chat_screen.dart';
+import 'package:quickblox_chat_flutter/screens/chat/Screens/messages_box.dart';
+import 'package:quickblox_sdk/models/qb_session.dart';
 import 'package:quickblox_sdk/models/qb_user.dart';
+import 'package:quickblox_sdk/quickblox_sdk.dart';
 
 class UsersScreen extends StatefulWidget {
   const UsersScreen({Key? key}) : super(key: key);
@@ -34,6 +37,19 @@ class _UsersScreenState extends State<UsersScreen> {
     return Scaffold(
         appBar: AppBar(
           title: Text("All Users"),
+          leading: IconButton(
+            icon: Icon(Icons.message),
+            onPressed: () {
+              QB.auth.getSession().then((value) {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => MessagesBoxPage(
+                              user: value!.userId!,
+                            )));
+              });
+            },
+          ),
           actions: [
             IconButton(
                 onPressed: () {

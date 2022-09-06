@@ -144,18 +144,10 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    //final Map blocks = widget.user.blocks!;
-    //print(blocks);
     return Scaffold(
         appBar: AppBar(
-            leading: BackButton(
-              onPressed: () => Navigator.pop(context),
-            ),
-            automaticallyImplyLeading: false,
-            elevation: 0.5,
             centerTitle: false,
             backgroundColor: Colors.black,
-            shadowColor: Theme.of(context).primaryColor,
             title: Text(widget.user.fullName!)),
         body: Column(
           mainAxisSize: MainAxisSize.min,
