@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +11,8 @@ import 'package:quickblox_sdk/models/qb_user.dart';
 import 'package:quickblox_sdk/quickblox_sdk.dart';
 
 import '../../../constants.dart';
+import '../../../utils/dialog_utils.dart';
+import '../../../utils/snackbar_utils.dart';
 import '../Services/message_sender.dart';
 import '../models/ChatMessage.dart';
 import '../models/fetch_messages.dart';
@@ -32,15 +35,19 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   final _formKey = GlobalKey<FormState>();
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
   final List<String?> errors = [];
   final TextEditingController _messageController = TextEditingController();
   String? messageText;
   File? file;
   bool isRecorded = false;
   String dialogId = "";
-  List<QBMessage?> messages = [];
+  String? _messageId;
+
+  List<ChatMessage?> messages = [];
 
   final sender = MessageSender();
+  StreamSubscription? _newMessageSubscription;
 
   @override
   void initState() {
@@ -65,10 +72,18 @@ class _ChatPageState extends State<ChatPage> {
     bool markAsRead = true;
 
     try {
-      List<QBMessage?> result = await QB.chat.getDialogMessages(dialogId);
+      List<QBMessage?> result =
+          await QB.chat.getDialogMessages(dialogId, sort: sort);
       print(result.last!.body!);
+      List<ChatMessage> messagesList = [];
+      result.forEach(
+        (element) => messagesList.add(ChatMessage(
+            messageTime: element!.dateSent!,
+            text: element.body!,
+            isSender: element.senderId != widget.user.id)),
+      );
       setState(() {
-        messages = result;
+        messages = messagesList;
       });
     } on PlatformException catch (e) {
       print(e);
@@ -85,20 +100,46 @@ class _ChatPageState extends State<ChatPage> {
       dialogId = result;
     });
     getMessages();
+    subscribeNewMessage();
   }
 
-  void addError({String? error}) {
-    if (!errors.contains(error))
-      setState(() {
-        errors.add(error);
-      });
-  }
+  void subscribeNewMessage() async {
+    if (_newMessageSubscription != null) {
+      SnackBarUtils.showResult(
+          _scaffoldKey,
+          "You already have a subscription for: " +
+              QBChatEvents.RECEIVED_NEW_MESSAGE);
+      return;
+    }
+    try {
+      _newMessageSubscription = await QB.chat
+          .subscribeChatEvent(QBChatEvents.RECEIVED_NEW_MESSAGE, (data) {
+        Map<dynamic, dynamic> map = Map<dynamic, dynamic>.from(data);
 
-  void removeError({String? error}) {
-    if (errors.contains(error))
-      setState(() {
-        errors.remove(error);
+        Map<dynamic, dynamic> payload =
+            Map<dynamic, dynamic>.from(map["payload"]);
+
+        _messageId = payload["id"] as String;
+
+        SnackBarUtils.showResult(
+            _scaffoldKey, "Received message: \n ${payload}");
+
+        setState(() {
+          messages.insert(
+              0,
+              ChatMessage(
+                  messageTime: payload['dateSent'],
+                  text: payload['body'],
+                  isSender: payload['senderId'] != widget.user.id));
+        });
+      }, onErrorMethod: (error) {
+        DialogUtils.showError(context, error);
       });
+      SnackBarUtils.showResult(
+          _scaffoldKey, "Subscribed: " + QBChatEvents.RECEIVED_NEW_MESSAGE);
+    } on PlatformException catch (e) {
+      DialogUtils.showError(context, e);
+    }
   }
 
   @override
@@ -107,32 +148,26 @@ class _ChatPageState extends State<ChatPage> {
     //print(blocks);
     return Scaffold(
         appBar: AppBar(
-          leading: BackButton(
-            onPressed: () => Navigator.pop(context),
-          ),
-          automaticallyImplyLeading: false,
-          elevation: 0.5,
-          shadowColor: Theme.of(context).primaryColor,
-          title: ChatHeaderWidget(
-            widget: widget,
-            buildContext: context,
-          ),
-        ),
+            leading: BackButton(
+              onPressed: () => Navigator.pop(context),
+            ),
+            automaticallyImplyLeading: false,
+            elevation: 0.5,
+            centerTitle: false,
+            backgroundColor: Colors.black,
+            shadowColor: Theme.of(context).primaryColor,
+            title: Text(widget.user.fullName!)),
         body: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Expanded(
                 child: ListView.builder(
+                    physics: BouncingScrollPhysics(),
+                    reverse: true,
                     itemCount: messages.length,
                     itemBuilder: ((context, index) {
-                      bool isSender =
-                          messages[index]!.senderId! != widget.user.id;
-                      ChatMessage message = ChatMessage(
-                          messageTime: messages[index]!.dateSent!,
-                          text: messages[index]!.body!,
-                          isSender: isSender);
                       return Message(
-                        message: message,
+                        message: messages[index]!,
                         userIMG: "default",
                       );
                     }))),
@@ -170,7 +205,7 @@ class _ChatPageState extends State<ChatPage> {
 
                                   await sender.sendMessage(
                                       dialogId, context, messageText!);
-                                  getMessages();
+                                  //getMessages();
                                   // await sender.sendMessage(
                                   //     context,
                                   //     widget.user.uid!,
@@ -208,15 +243,12 @@ class _ChatPageState extends State<ChatPage> {
       style: TextStyle(fontSize: 16),
       onSaved: (newValue) => messageText = newValue,
       onChanged: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: "Message feel can not be empty!");
-        }
+        if (value.isNotEmpty) {}
         return null;
       },
       validator: (value) {
         if (value!.isEmpty) {
-          addError(error: "Message feel can not be empty!");
-          return "";
+          return "Message field can not be empty!";
         }
         return null;
       },

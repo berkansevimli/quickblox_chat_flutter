@@ -23,22 +23,23 @@ class TextMessage extends StatelessWidget {
         constraints: BoxConstraints(maxWidth: SizeConfig.screenWidth / 1.5),
         padding: EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: isSender
-              ? Theme.of(context).highlightColor
-              : Theme.of(context).canvasColor,
+          color: isSender ? Colors.black : Colors.red,
           borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(12),
-              topRight: Radius.circular(12),
-              bottomLeft: isSender ? Radius.circular(12) : Radius.circular(0),
-              bottomRight: isSender ? Radius.circular(0) : Radius.circular(12)),
+              topLeft: Radius.circular(24),
+              topRight: Radius.circular(24),
+              bottomLeft: isSender ? Radius.circular(24) : Radius.circular(0),
+              bottomRight: isSender ? Radius.circular(0) : Radius.circular(24)),
         ),
         child: Column(
           crossAxisAlignment:
               isSender ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
-            Text(
-              message!.text,
-              style: TextStyle(),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              child: Text(
+                message!.text,
+                style: TextStyle(color: Colors.white),
+              ),
             ),
             Padding(
               padding: EdgeInsets.all(4.0),
@@ -47,11 +48,9 @@ class TextMessage extends StatelessWidget {
                     DateTime.fromMillisecondsSinceEpoch(message!.messageTime)),
                 style: isSender
                     ? TextStyle(
-                        fontSize: 10,
-                      )
+                        fontSize: 10, color: Colors.white.withOpacity(0.8))
                     : TextStyle(
-                        fontSize: 10,
-                      ),
+                        fontSize: 10, color: Colors.white.withOpacity(0.8)),
               ),
             )
           ],
