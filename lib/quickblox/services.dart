@@ -29,6 +29,12 @@ class QuickbloxServices {
 
       DataHolder.getInstance().setSession(qbSession);
       DataHolder.getInstance().setUser(qbUser);
+      try {
+        await QB.chat.connect(qbUser!.id!, password);
+        SnackBarUtils.showResult(scaffoldKey, "The chat was connected");
+      } on PlatformException catch (e) {
+        DialogUtils.showError(context, e);
+      }
       Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (builder) => UsersScreen()),
@@ -71,6 +77,12 @@ class QuickbloxServices {
     try {
       await QB.auth.logout();
       SnackBarUtils.showResult(scaffoldKey, "Logout success");
+      try {
+        await QB.chat.disconnect();
+        SnackBarUtils.showResult(scaffoldKey, "The chat was connected");
+      } on PlatformException catch (e) {
+        DialogUtils.showError(context, e);
+      }
       Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (builder) => SignInScreen()),

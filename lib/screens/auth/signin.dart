@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:quickblox_chat_flutter/quickblox/services.dart';
 import 'package:quickblox_chat_flutter/quickblox/setup.dart';
 import 'package:quickblox_chat_flutter/screens/auth/signup.dart';
+import 'package:quickblox_chat_flutter/size_config.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({Key? key}) : super(key: key);
@@ -25,6 +26,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
   @override
   Widget build(BuildContext context) {
+    SizeConfig().init(context);
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(

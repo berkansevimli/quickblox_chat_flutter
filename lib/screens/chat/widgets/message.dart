@@ -16,13 +16,7 @@ class Message extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget messageContaint(ChatMessage message) {
-      switch (message.messageType) {
-        case "text":
-          return TextMessage(message: message);
-
-        default:
-          return SizedBox();
-      }
+      return TextMessage(message: message);
     }
 
     return Padding(

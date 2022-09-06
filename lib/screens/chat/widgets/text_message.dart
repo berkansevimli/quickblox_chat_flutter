@@ -16,17 +16,12 @@ class TextMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isSender = message!.isSender;
-    String type = message!.messageType;
 
     return Padding(
       padding: EdgeInsets.only(right: isSender ? 8.0 : 0.0),
       child: Container(
         constraints: BoxConstraints(maxWidth: SizeConfig.screenWidth / 1.5),
-        padding: EdgeInsets.only(
-          left: type == "text" ? kDefaultPadding * 0.75 : 0,
-          right: type == "text" ? kDefaultPadding * 0.75 : 0,
-          top: type == "text" ? kDefaultPadding / 2 : 0,
-        ),
+        padding: EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: isSender
               ? Theme.of(context).highlightColor
@@ -43,14 +38,13 @@ class TextMessage extends StatelessWidget {
           children: [
             Text(
               message!.text,
-              style: TextStyle(
-                color: Theme.of(context).textTheme.bodyText1!.color,
-              ),
+              style: TextStyle(),
             ),
             Padding(
-              padding: type == "text" ? EdgeInsets.all(4.0) : EdgeInsets.all(8),
+              padding: EdgeInsets.all(4.0),
               child: Text(
-                Utils.toTime(message!.messageTime),
+                Utils.toTime(
+                    DateTime.fromMillisecondsSinceEpoch(message!.messageTime)),
                 style: isSender
                     ? TextStyle(
                         fontSize: 10,

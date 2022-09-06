@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quickblox_chat_flutter/quickblox/services.dart';
+import 'package:quickblox_chat_flutter/screens/chat/Screens/chat_screen.dart';
 import 'package:quickblox_sdk/models/qb_user.dart';
 
 class UsersScreen extends StatefulWidget {
@@ -46,6 +47,13 @@ class _UsersScreenState extends State<UsersScreen> {
             itemBuilder: ((context, index) {
               return ListTile(
                 title: Text(userList[index]!.login!),
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (builder) =>
+                              ChatPage(user: userList[index]!)));
+                },
               );
             })));
   }

@@ -14,7 +14,61 @@
 // import '../../../../helper/dialogs.dart';
 // import '../../../../utils.dart';
 
-class MessageSender {}
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:quickblox_sdk/models/qb_dialog.dart';
+import 'package:quickblox_sdk/quickblox_sdk.dart';
+import 'package:quickblox_sdk/chat/constants.dart';
+
+import '../../../utils/dialog_utils.dart';
+import '../../../utils/snackbar_utils.dart';
+
+class MessageSender {
+  Future<String> createDialog(int opponentID, BuildContext context) async {
+    List<int> occupantsIds = [opponentID];
+    String dialogName = "FLUTTER_CHAT_" + DateTime.now().millisecond.toString();
+    String dialogPhoto = "some photo url";
+
+    int dialogType = QBChatDialogTypes.CHAT;
+
+    try {
+      QBDialog? createdDialog = await QB.chat.createDialog(dialogType,
+          dialogName: dialogName,
+          occupantsIds: occupantsIds,
+          dialogPhoto: dialogPhoto);
+
+      if (createdDialog != null) {
+        String _dialogId = createdDialog.id!;
+        print("The dialog $_dialogId was created");
+        return _dialogId;
+      } else {
+        return "";
+      }
+    } on PlatformException catch (e) {
+      DialogUtils.showError(context, e);
+      return "";
+    }
+  }
+
+  Future sendMessage(
+      String _dialogId, BuildContext context, String messageText) async {
+    ;
+
+    try {
+      Map<String, String> properties = Map();
+      properties["testProperty1"] = "testPropertyValue1";
+      properties["testProperty2"] = "testPropertyValue2";
+      properties["testProperty3"] = "testPropertyValue3";
+
+      await QB.chat.sendMessage(_dialogId,
+          body: messageText, saveToHistory: true, properties: properties);
+
+      print("The message was sent to dialog: $_dialogId");
+    } on PlatformException catch (e) {
+      DialogUtils.showError(context, e);
+    }
+  }
+}
 
 // class MessageSender {
 //   bool _isRoomExist = false;
