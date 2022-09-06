@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:quickblox_chat_flutter/screens/call/video_call/video_call_setup.dart';
 import 'package:quickblox_sdk/chat/constants.dart';
 import 'package:quickblox_sdk/models/qb_filter.dart';
 import 'package:quickblox_sdk/models/qb_message.dart';
@@ -146,9 +147,24 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-            centerTitle: false,
-            backgroundColor: Colors.black,
-            title: Text(widget.user.fullName!)),
+          centerTitle: false,
+          backgroundColor: Colors.black,
+          title: Text(widget.user.fullName!),
+          actions: [
+            IconButton(
+                onPressed: () {
+                  QB.auth.getSession().then((value) {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (builder) => VideoCallSetup(
+                                OPPONENTS_IDS: [widget.user.id!],
+                                LOGGED_USER_ID: value!.userId!)));
+                  });
+                },
+                icon: Icon(Icons.video_call))
+          ],
+        ),
         body: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
